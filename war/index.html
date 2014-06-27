@@ -20,8 +20,6 @@
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="css/mapStyle.css">
     <script src="js/highstock.js"></script>
-
- 
     <!-- Full Screen Google Map -->
     <style type="text/css">
         html {
@@ -83,10 +81,16 @@
 </div>
 <div id="loading" style="z-index:99999;position:fixed;display:none;"><img src="image/loading.gif" width="60px" height="60px" /></div>
 <div ng-controller="MyCntrl" class="ng-scope">
- <div id="panel">
-      <input id="stationName"  type="textbox" placeholder="Enter Grower Station Name" style="width:180px">
-      <input type="button" value="Locate Station" onclick="codeAddress()">
+
+ <div id="panel"style="width:200px">
+      <input id="growerName"  type="text" placeholder="Enter Grower Name" style="width:180px;" ></br>
+      <select id="stationList">
+  <option value="">Station Name</option>
+</select></br>
+      <input type="button" value="Locate Station" onclick="codeAddress()"> 
+      <div id="panel2"style="width:200px"><input type="button" value="History Download" onclick=""></div>    
     </div>
+  
 <div id="growerPopup" class="foo" title="Weather Graph" >
 <div>
 <div id="growerChoice" style="padding-top: 15px;float:left">
@@ -107,12 +111,13 @@
     <option>--</option>
 </select>
 </div>
-<div style="padding-top: 15px;padding-left: 25px;float:left;" >
+<div id="parameter" style="padding-top: 15px;padding-left: 25px;float:left;" >
 <label>Parameter:<label>
-<select id="parameter" onchange=parameterChange(); >
-    <option value="dry">Dry Bulb Temperature</option>
-    <option value="wet">Wet Bulb Temperature</option>
-    <option value="rainfall">Rainfall</option>
+<select
+   ng-change="parameterChange()"
+   ng-model="parameter" 
+   ng-options="p.label for p in parameters" >
+    <option>--</option>
 </select>
 </div>
 <div id="noDataError" style="padding-top: 20px;float:left" >
@@ -159,7 +164,8 @@
           Date Time: <span ng-bind="dateTime"></span>
         </li>        
       </ul> 
-      <span>*Since January 1st 2014</span>
+      <span ng-bind="legend"></span>
+      
 </div>
 </div>
 <div id="madisDialog" title="Madis Station" >

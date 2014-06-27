@@ -2,10 +2,10 @@ var growerStnData = [];
 var geocoder;
 var map;
 var boundchangedTask;
-
+var grower = new Array();
 function MyCntrl($scope) {
-	var STATION_NAME_URL = "http://fdacswx.fawn.ifas.ufl.edu/index.php/test/read/station/format/json";
-	var GROWER_OBZ_URL = 'http://test.fdacswx.fawn.ifas.ufl.edu/index.php/read/latestobz/format/json';
+	var STATION_NAME_URL = "http://fdacswx.fawn.ifas.ufl.edu/index.php/read/station/format/json";
+	var GROWER_OBZ_URL = 'http://fdacswx.fawn.ifas.ufl.edu/index.php/read/latestobz/format/json';
 	var FAWN_STATION_URL = "http://fawn.ifas.ufl.edu/station/station.php?id=";
 	var FAWN_OBZ_URL = 'http://fawn.ifas.ufl.edu/controller.php/latestmapjson/';
 	var MADIS_OBZ_URL = 'http://fawn.ifas.ufl.edu/controller.php/nearbyNonFawn/all/';
@@ -24,7 +24,8 @@ function MyCntrl($scope) {
 	var id = "weather data";
 	var idToGrowerName = [];
 	var stationNameToId = [];
-	var grower = new Array();
+
+	var growerNames = new Array();
 	var screenWidth = (window.screen.availWidth > 1680 ? 1680
 			: window.screen.availWidth); // is it time consuming?
 	// alert(screenWidth);
@@ -35,18 +36,19 @@ function MyCntrl($scope) {
 	var previousData = [];// globel
 	var checkboxTask; // globel
 	var stationName = [];
-    /*
+	var stationInstalledTime=[];
+    
 	$scope.parameters = [ {
 		"id" : "dry",
 		"label" : "Dry Bulb Temperature"
 	}, {
 		"id" : "wet",
-		"label" : "Web Bulb Temperature"
+		"label" : "Wet Bulb Temperature"
 	}, {
 		"id" : "rain",
 		"label" : "Rainfall"
 	} ];
-	$scope.parameter = $scope.parameters[0];*/
+	$scope.parameter = $scope.parameters[0];
 
 	if ($.browser.msie && window.XDomainRequest) {
 		// Use Microsoft XDR
@@ -62,24 +64,33 @@ function MyCntrl($scope) {
 				for ( var i = 0; i < stnObj.length; i++) {
 					idToGrowerName[stnObj[i].id] = stnObj[i].grower_name;
 					stationNameToId[stnObj[i].station_name] = stnObj[i].id;
-					stationName[i] = stnObj[i].station_name;
+					//stationName[i] = stnObj[i].station_name;
+					stationInstalledTime[stnObj[i].id]=stnObj[i].installed_date;
 					var key = stnObj[i].grower_name;
 					if (grower.hasOwnProperty(key)) {
-						grower[key][grower[key].length] = stnObj[i].id + "$$$"
-								+ stnObj[i].station_name;
+						grower[key][grower[key].length] = stnObj[i].station_name;
 					} else {
 						// alert(stnObj[i].id);
-						var id = [];
-						id[0] = stnObj[i].id + "$$$" + stnObj[i].station_name;
-						grower[key] = id;
+						var stationName=[];
+						 stationName[0] = stnObj[i].station_name;
+						grower[key] = stationName;
 					}
 				}
 				var keys = Object.keys(grower);
 				keys.sort(function(a, b) {
 					return (a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0));
 				});
-				$("#stationName").autocomplete({
-					source : stationName
+				$("#growerName").autocomplete({
+					source : keys,
+					change: function( event, ui ) {
+						$('#stationList').empty();
+						var growerName = $("#growerName").val();
+						var stationList = grower[growerName];
+						for(var i=0;i<stationList.length;i++){
+							$('#stationList').append('<option value=' + stationNameToId[stationList[i]] + '>' + stationList[i] + '</option>');							
+						}
+						
+					}
 				});
 				$scope.growerOption = [];
 				for ( var i = 0; i < keys.length; i++) {
@@ -108,24 +119,33 @@ function MyCntrl($scope) {
 				for ( var i = 0; i < stnObj.length; i++) {
 					idToGrowerName[stnObj[i].id] = stnObj[i].grower_name;
 					stationNameToId[stnObj[i].station_name] = stnObj[i].id;
-					stationName[i] = stnObj[i].station_name;
+					stationInstalledTime[stnObj[i].id]=stnObj[i].installed_date;
+					//stationName[i] = stnObj[i].station_name;
 					var key = stnObj[i].grower_name;
 					if (grower.hasOwnProperty(key)) {
-						grower[key][grower[key].length] = stnObj[i].id + "$$$"
-								+ stnObj[i].station_name;
+						grower[key][grower[key].length] = stnObj[i].station_name;
 					} else {
 						// alert(stnObj[i].id);
-						var id = [];
-						id[0] = stnObj[i].id + "$$$" + stnObj[i].station_name;
-						grower[key] = id;
+						var stationName=[];
+						 stationName[0] = stnObj[i].station_name;
+						grower[key] = stationName;
 					}
 				}
 				var keys = Object.keys(grower);
 				keys.sort(function(a, b) {
 					return (a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0));
 				});
-				$("#stationName").autocomplete({
-					source : stationName
+				$("#growerName").autocomplete({
+					source : keys,
+					change: function( event, ui ) {
+						$('#stationList').empty();
+						var growerName = $("#growerName").val();
+						var stationList = grower[growerName];
+						for(var i=0;i<stationList.length;i++){
+							$('#stationList').append('<option value=' + stationNameToId[stationList[i]] + '>' + stationList[i] + '</option>');							
+						}
+						
+					}
 				});
 				$scope.growerOption = [];
 
@@ -146,15 +166,14 @@ function MyCntrl($scope) {
 		var growerName = $scope.grower.label;
 		$scope.stationOption = [];
 		// alert($scope.grower.label);
-		var id = grower[growerName];
-		for ( var i = 0; i < id.length; i++) {
-			var arr = id[i].split("$$$");
+		var stationList = grower[growerName];
+		for ( var i = 0; i < stationList.length; i++) {
 			$scope.stationOption[i] = {
-				"id" : arr[0],
-				"label" : arr[1]
+				"id" : stationNameToId[stationList[i]],
+				"label" : stationList[i]
 			};
-			//$scope.parameter = $scope.parameters[0];
-			// $scope.station = $scope.stationOption[0];
+			$scope.parameter = $scope.parameters[0];
+		 $scope.station = $scope.stationOption[0];
 		}
 
 	}
@@ -175,7 +194,7 @@ function MyCntrl($scope) {
 	}
 	var fetchData = function() {
 		// alert($scope.station.id);
-		var url = 'http://test.fdacswx.fawn.ifas.ufl.edu/index.php/read/sevendaytimestamp/station_id/'
+		var url = 'http://fdacswx.fawn.ifas.ufl.edu/index.php/read/sevendaytimestamp/station_id/'
 				+ $scope.station.id + '/format/json/';
 		// if in IE browser
 		if ($.browser.msie && window.XDomainRequest) {
@@ -235,8 +254,8 @@ function MyCntrl($scope) {
 	}
 
 	var parseData = function(stnData) {
-		//var dataType = $scope.parameter.id;
-		var dataType = $( "#parameter" ).val();
+		var dataType = $scope.parameter.id;
+		//var dataType = $( "#parameter" ).val();
 		if (dataType == "wet") {
 			newTitle = 'Graphic Weather Data (Temperature F)';
 			seriesName = "Wet Bulb Temperature";
@@ -307,7 +326,11 @@ function MyCntrl($scope) {
 				renderTo : 'container',
 				defaultSeriesType : 'line'
 			},
-			
+		    plotOptions: {
+		    	line: {
+		    		gapSize: null
+		    	}
+	        },
 			rangeSelector : {
 				buttons : [ {
 					type : 'minute',
@@ -326,7 +349,8 @@ function MyCntrl($scope) {
 					count : 3,
 					text : '3d'
 				}, {
-					type : 'all',
+					type : 'day',
+					count : 7,
 					text : '7d'
 				} ]
 
@@ -375,6 +399,26 @@ function MyCntrl($scope) {
 	}
 	var displayWeatherInformation = function() {
 		var id = $scope.station.id;
+		var growerStn = growerStnData;
+		for ( var i = 0; i < growerStn.length; i++) {
+			if (growerStn[i].stnID == id) {
+				$scope.currentStation = growerStn[i];
+				break;
+			}
+		}
+		
+		for ( var name in $scope.currentStation) {
+			if ($scope.currentStation[name] === null
+					|| $scope.currentStation[name] == '9999') {
+				$scope.currentStation[name] = 'NA';
+			}
+		}
+		
+			//$scope.$apply(updateWeatherInformation);
+		//updateWeatherInformation();
+
+		
+		var id = $scope.station.id;
 		if ($.browser.msie && window.XDomainRequest) {
 			// Use Microsoft XDR
 			var xdr = new XDomainRequest();
@@ -396,6 +440,15 @@ function MyCntrl($scope) {
 				}
 				$scope
 						.$apply(function() {
+								if ($scope.currentStation.fresh) {
+									$scope.fresh = 'Current (updated every 15 min)';
+									$("#fresh").css('color',
+											'black');
+								} else {
+									$scope.fresh = 'This station has not been updated since '
+											+ $scope.currentStation.date_time;
+									$("#fresh").css('color', 'red');
+								}
 							$scope.stnID = $scope.currentStation.station_id;
 							$scope.stnName = $scope.currentStation.station_name;
 							$scope.stnLat = $scope.currentStation.latitude;
@@ -409,6 +462,24 @@ function MyCntrl($scope) {
 							$scope.temperature = $scope.currentStation.dry_bulb_air_temp;
 							$scope.windSpeed = $scope.currentStation.wind_speed;
 							$scope.dateTime = $scope.currentStation.date_time;
+						    var installedTime = stationInstalledTime[$scope.stnID];
+							if($scope.currentStation.vendor_name=="Ag-tronix"){
+								if(installedTime>='2014-03-10'){
+									$scope.legend = "*Since weather station installation"
+								}
+								else{
+								$scope.legend = "*Since March 10, 2014";
+								}
+							}
+							else{
+								if(installedTime >='2014-01-01'){
+									$scope.legend = "*Since weather station installation"
+								}
+								else{
+								$scope.legend = "*Since January 1 of this current year";
+								}
+								
+							}
 						});
 			};
 			xdr.onprogress = function() {
@@ -458,10 +529,28 @@ function MyCntrl($scope) {
 											$scope.webBulbTemp = $scope.currentStation.wet_bulb_temp;
 											$scope.rain = $scope.currentStation.rainfall;
 											$scope.totalRain = Math
-													.round(Number($scope.currentStation.total_rain_inche_since_installed) * 100) / 100
+											.round(Number($scope.currentStation.total_rain_inche_since_installed) * 100) / 100
 											$scope.temperature = $scope.currentStation.dry_bulb_air_temp;
 											$scope.windSpeed = $scope.currentStation.wind_speed;
 											$scope.dateTime = $scope.currentStation.date_time;
+										    var installedTime = stationInstalledTime[$scope.stnID];
+											if($scope.currentStation.vendor_name=="Ag-tronix"){
+												if(installedTime>='2014-03-10'){
+													$scope.legend = "*Since weather station installation"
+												}
+												else{
+												$scope.legend = "*Since March 10, 2014";
+												}
+											}
+											else{
+												if(installedTime >='2014-01-01'){
+													$scope.legend = "*Since weather station installation"
+												}
+												else{
+												$scope.legend = "*Since January 1 of this current year";
+												}
+												
+											}
 										});
 
 							});
@@ -506,16 +595,16 @@ function MyCntrl($scope) {
 		var centerLatLng = new google.maps.LatLng(28.2967, -81.3668);
 		var map = new google.maps.Map(document.getElementById('map'), {
 			mapTypeControlOptions : {
-				mapTypeIds : [ 'weather', 'satellite' ]
+				mapTypeIds : [ 'map', 'satellite' ]
 			},
 			mapTypeControl : true,
 			center : centerLatLng,
 			zoom : 7,
-			mapTypeId : 'weather'
+			mapTypeId : 'map'
 		});
-		map.mapTypes.set('weather', new google.maps.StyledMapType(
+		map.mapTypes.set('map', new google.maps.StyledMapType(
 				weather_style, {
-					name : 'weather'
+					name : 'map'
 				}));
 		var homeControlDiv = document.createElement('div');
 		var homeControl = new DataControl(homeControlDiv, map);
@@ -634,6 +723,7 @@ function MyCntrl($scope) {
 					break;
 				}
 			}
+			
 
 			fetchData();
 			displayWeatherInformation();
@@ -721,19 +811,11 @@ function MyCntrl($scope) {
 		var noOverlapNewObjs = removeOverlap([], inBoundNewObjs, bound
 				.pixelsPerRadLat(), bound.pixelsPerRadLng());
 		var time4 = new Date().getTime();
-		// alert("noOverlapNewObjs:"+noOverlapNewObjs.length);
 		clearOverlays(markers);
 		var time5 = new Date().getTime();
 		markers = loadStnMarkers(noOverlapNewObjs);
 		var time6 = new Date().getTime();
 		preBound = bound;
-
-		// console.log ("====filldata total: "+(time6-time2)+"======");
-		// console.log ("markers length :" + markers.length);
-		// console.log ("filter: "+(time3-time2));
-		// console.log ("removeoverlap: "+(time4-time3));
-		// console.log ("clearoverlay: "+(time5-time4));
-		// console.log ("loadmarker: "+(time6-time5));
 		setTimeout(function() {
 			$('#loading').css("display", "none");
 		}, 500);
@@ -742,14 +824,8 @@ function MyCntrl($scope) {
 
 	function clearOverlays(markers) {
 		if (Object.prototype.toString.call(markers) === '[object Array]') {
-			// //console.log("/////////////marker length"+markers.length);
 			for ( var i = 0; i < markers.length; i++) {
 				markers[i].setMap(null);
-				/*
-				 * if((time2-time1)>=40){
-				 * //console.log("makers"+markers[i].labelContent);
-				 * //console.log("set time: "+(time2-time1)); }
-				 */
 			}
 		}
 	}
@@ -912,12 +988,11 @@ function MyCntrl($scope) {
 		// Setting padding to 5 px will offset the control
 		// from the edge of the map
 		controlDiv.style.padding = '15px';
-
 		var controlFawn = document.createElement('div');
 		controlFawn.style.backgroundColor = 'white';
 		controlFawn.style.borderStyle = 'solid';
 		controlFawn.innerHTML = '<div>'
-				+ 'Please select your <br/> source of weather <br />station. Zoom in to<br /> see more stations<br /><label class="fawnLabel" id="checkbox"onclick="fawnCheck()">'
+				+ 'Please select source <br />station. Zoom in to<br /> see more stations<br /><label class="fawnLabel" id="checkbox"onclick="fawnCheck()">'
 				+ '<input id="fawn" type="checkbox" >' + 'Fawn' + '</label>'
 				+ ' </div>'
 
@@ -925,7 +1000,7 @@ function MyCntrl($scope) {
 		controlMadis = document.createElement('div');
 		controlMadis.innerHTML = '<div>'
 				+ '<label class="madisLabel" id="checkbox2"onclick="madisCheck()">'
-				+ '<input id="madis" type="checkbox">' + 'Madis' + '</label>'
+				+ '<input id="madis" type="checkbox">' + 'NOAA' + '</label>'
 				+ '</div>';
 		controlFawn.appendChild(controlMadis);
 		controlGrower = document.createElement('div');
@@ -937,7 +1012,7 @@ function MyCntrl($scope) {
 		controlUser = document.createElement('div');
 		controlUser.innerHTML = '<div>'
 				+ '<label class="userEnteredDataLabel" id="checkbox4"onclick="userCheck()">'
-				+ '<input id="user" type="checkbox"  >' + 'User'
+				+ '<input id="user" type="checkbox"  >' + 'Manual'
 				+ '</label>' + '</div>';
 		controlFawn.appendChild(controlUser);
 		
@@ -995,9 +1070,10 @@ function MyCntrl($scope) {
 var newMarker;
 function codeAddress() {
 	// var address = document.getElementById('address').value;
-	var stationName = document.getElementById('stationName').value;
+	var stationId = document.getElementById('stationList').value;
+	//alert(stationId);
 	var result = $.grep(growerStnData, function(e) {
-		return e.stnName == stationName;
+		return e.stnID == stationId;
 	});
 	if (result.length == 0) {
 		alert("Please make sure that you enter the right station name!");

@@ -9,7 +9,7 @@ font-weight:bolder !important;
 #panel {
   position: absolute;
   width:300px;
-  top: 150px;
+  top: 170px;
   right: 140px;
   margin-left: -180px;
   z-index: 5;

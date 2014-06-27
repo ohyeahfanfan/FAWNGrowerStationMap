@@ -36,6 +36,7 @@ GrowerStation.prototype.getRain=function(){
 	
 	return this.rainfall;
 }
+
 GrowerStation.prototype.getTemp=function(){
 		return this.temper;
 	}
@@ -48,7 +49,7 @@ GrowerStation.prototype.getWindSpeed=function(){
 	}
 }
 GrowerStation.prototype.getTotalRain=function(){
-	if(this.vendor_name=="Ag-tronix"||this.vendor_name=="Rainwise"||this.total_rainfall=='NA'){
+	if(this.vendor_name=="Ag-tronix"||this.total_rainfall=='NA'){
 		return "NA"
 	}
 	else{
