@@ -255,7 +255,6 @@ function MyCntrl($scope) {
 
 	var parseData = function(stnData) {
 		var dataType = $scope.parameter.id;
-		//var dataType = $( "#parameter" ).val();
 		if (dataType == "wet") {
 			newTitle = 'Graphic Weather Data (Temperature F)';
 			seriesName = "Wet Bulb Temperature";
